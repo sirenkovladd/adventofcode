@@ -21,7 +21,7 @@ fn parseRow(input: []const u8, i: *usize, minTypeInt: type) !struct { minTypeInt
     return .{ v1, v2 };
 }
 
-fn calculate(input: []const u8, minTypeInt: type, allocator: std.mem.Allocator) !u32 {
+fn calculate(input: []const u8, comptime minTypeInt: type, allocator: std.mem.Allocator) !u32 {
     var first = std.ArrayList(minTypeInt).init(allocator);
     defer first.deinit();
     var second = std.ArrayList(minTypeInt).init(allocator);
@@ -43,9 +43,11 @@ fn calculate(input: []const u8, minTypeInt: type, allocator: std.mem.Allocator) 
     std.sort.block(minTypeInt, first.items, {}, lessThan);
     std.sort.block(minTypeInt, second.items, {}, lessThan);
 
+    const signedType = std.meta.Int(.signed, @typeInfo(minTypeInt).Int.bits + 1);
+
     var sum: u32 = 0;
     for (first.items, second.items) |v1, v2| {
-        sum += @abs(@as(i18, v1) - @as(i18, v2));
+        sum += @abs(@as(signedType, v1) - @as(signedType, v2));
     }
     return sum;
 }
