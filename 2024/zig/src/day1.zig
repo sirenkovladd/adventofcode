@@ -1,4 +1,5 @@
 const std = @import("std");
+const file_contents = @embedFile("day1");
 
 fn parseRow(input: []const u8, i: *usize, minTypeInt: type) !struct { minTypeInt, minTypeInt } {
     const start = i.*;
@@ -21,18 +22,24 @@ fn parseRow(input: []const u8, i: *usize, minTypeInt: type) !struct { minTypeInt
     return .{ v1, v2 };
 }
 
-fn calculate(input: []const u8, comptime minTypeInt: type, allocator: std.mem.Allocator) !u32 {
+fn parse(input: []const u8, comptime minTypeInt: type, allocator: std.mem.Allocator) !struct { std.ArrayList(minTypeInt), std.ArrayList(minTypeInt) } {
     var first = std.ArrayList(minTypeInt).init(allocator);
-    defer first.deinit();
     var second = std.ArrayList(minTypeInt).init(allocator);
-    defer second.deinit();
     var i: usize = 0;
     while (i < input.len) {
         const row = try parseRow(input, &i, minTypeInt);
         try first.append(row[0]);
         try second.append(row[1]);
     }
+    return .{ first, second };
+}
 
+fn calculate(input: []const u8, comptime minTypeInt: type, allocator: std.mem.Allocator) !u32 {
+    const parsed = try parse(input, minTypeInt, allocator);
+    const first = parsed[0];
+    const second = parsed[1];
+    defer first.deinit();
+    defer second.deinit();
     const lessThan = struct {
         fn lessThen(context: void, v1: minTypeInt, v2: minTypeInt) bool {
             _ = context;
@@ -52,9 +59,37 @@ fn calculate(input: []const u8, comptime minTypeInt: type, allocator: std.mem.Al
     return sum;
 }
 
+fn calculate2(input: []const u8, comptime minTypeInt: type, allocator: std.mem.Allocator) !u32 {
+    const parsed = try parse(input, minTypeInt, allocator);
+    const first = parsed[0];
+    const second = parsed[1];
+    defer first.deinit();
+    defer second.deinit();
+
+    var map = std.AutoHashMap(minTypeInt, u8).init(allocator);
+    defer map.deinit();
+    for (second.items) |val| {
+        const entr = try map.getOrPut(val);
+        if (!entr.found_existing) {
+            entr.value_ptr.* = 0;
+        }
+        entr.value_ptr.* += 1;
+    }
+
+    var sum: u32 = 0;
+    for (first.items) |val| {
+        // std.debug.print("{} {} {any}\n", .{ sum, val, map.get(val) });
+        sum += val * @as(u32, @intCast((map.get(val) orelse 0)));
+    }
+    return sum;
+}
+
 pub fn result(allocator: std.mem.Allocator) !u32 {
-    const file_contents = @embedFile("day1");
     return calculate(file_contents, u17, allocator);
+}
+
+pub fn result2(allocator: std.mem.Allocator) !u32 {
+    return calculate2(file_contents, u17, allocator);
 }
 
 test "simple test" {
@@ -69,4 +104,11 @@ test "example test" {
 
     const res = try calculate("3 4\n4 3\n2 5\n1 3\n3 9\n3 3", u4, std.testing.allocator);
     try expect(res == 11);
+}
+
+test "part 2 test" {
+    const expect = std.testing.expect;
+
+    const res = try calculate2("3 4\n4 3\n2 5\n1 3\n3 9\n3 3", u4, std.testing.allocator);
+    try expect(res == 31);
 }
