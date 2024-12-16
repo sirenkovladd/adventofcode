@@ -9,6 +9,7 @@ pub fn main() !void {
     std.debug.print("day2.1: {}\n", .{try day2.result()});
     std.debug.print("day2.2: {}\n", .{try day2.result2()});
     std.debug.print("day3.1: {}\n", .{day3.result1()});
+    std.debug.print("day3.2: {}\n", .{day3.result2()});
 }
 
 test {
