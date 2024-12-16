@@ -1,5 +1,5 @@
 const std = @import("std");
-const file_contents = @embedFile("day2");
+const file_contents = @embedFile("assert/day2.txt");
 
 const Direction = enum {
     Empty,

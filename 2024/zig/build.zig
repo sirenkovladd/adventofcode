@@ -13,8 +13,22 @@ pub fn build(b: *std.Build) void {
         .target = target,
         .optimize = optimize,
     });
-    exe.root_module.addAnonymousImport("day1", .{ .root_source_file = .{ .cwd_relative = "../assert/day1.txt" } });
-    exe.root_module.addAnonymousImport("day2", .{ .root_source_file = .{ .cwd_relative = "../assert/day2.txt" } });
+
+    // add assert files
+    var iterator = blk: {
+        var assertFolder = std.fs.cwd().openDir("../assert/", .{}) catch unreachable;
+        break :blk assertFolder.iterate();
+    };
+    var cwd_relative: [30]u8 = undefined;
+    const assertFolder = "../assert/";
+    @memcpy(cwd_relative[0..assertFolder.len], assertFolder);
+    while (iterator.next() catch unreachable) |file| {
+        if (file.kind == .file) {
+            @memcpy(cwd_relative[assertFolder.len .. assertFolder.len + file.name.len], file.name);
+            exe.root_module.addAnonymousImport(cwd_relative[3 .. assertFolder.len + file.name.len], .{ .root_source_file = .{ .cwd_relative = cwd_relative[0 .. assertFolder.len + file.name.len] } });
+        }
+    }
+
     b.installArtifact(exe);
 
     const run_cmd = b.addRunArtifact(exe);

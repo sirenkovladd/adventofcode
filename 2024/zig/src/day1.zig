@@ -1,5 +1,5 @@
 const std = @import("std");
-const file_contents = @embedFile("day1");
+const file_contents = @embedFile("assert/day1.txt");
 
 fn parseRow(input: []const u8, i: *usize, minTypeInt: type) !struct { minTypeInt, minTypeInt } {
     const start = i.*;
