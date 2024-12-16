@@ -14,6 +14,7 @@ pub fn build(b: *std.Build) void {
         .optimize = optimize,
     });
     exe.root_module.addAnonymousImport("day1", .{ .root_source_file = .{ .cwd_relative = "../assert/day1.txt" } });
+    exe.root_module.addAnonymousImport("day2", .{ .root_source_file = .{ .cwd_relative = "../assert/day2.txt" } });
     b.installArtifact(exe);
 
     const run_cmd = b.addRunArtifact(exe);
