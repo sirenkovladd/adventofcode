@@ -60,7 +60,18 @@ fn nXmas(inp: []const u8, row_len: usize, i: usize) ResultType1 {
     return res;
 }
 
-fn calculate(inp: []const u8) ResultType1 {
+fn validDiagonal(v1: u8, v2: u8) bool {
+    return (v1 == 'M' or v1 == 'S') and (v2 == 'M' or v2 == 'S') and v1 != v2;
+}
+
+fn nX_mas(inp: []const u8, row_len: usize, i: usize) bool {
+    const x = i % (row_len + 1);
+    const y = i / (row_len + 1);
+    const height = inp.len / row_len;
+    return 0 < x and x + 1 < row_len and 0 < y and y + 1 < height and validDiagonal(inp[i - row_len - 2], inp[i + row_len + 2]) and validDiagonal(inp[i - row_len], inp[i + row_len]);
+}
+
+fn calculate1(inp: []const u8) ResultType1 {
     const row_len = end: {
         for (0..inp.len) |i| {
             if (inp[i] == '\n') break :end i;
@@ -78,37 +89,60 @@ fn calculate(inp: []const u8) ResultType1 {
 }
 
 pub fn result1() ResultType1 {
-    return calculate(file_contents);
+    return calculate1(file_contents);
+}
+
+fn calculate2(inp: []const u8) ResultType1 {
+    const row_len = end: {
+        for (0..inp.len) |i| {
+            if (inp[i] == '\n') break :end i;
+        }
+        unreachable;
+    };
+    // std.debug.print("{}\n", .{row_len});
+    var sum: ResultType1 = 0;
+    for (0..inp.len, inp) |i, c| {
+        if (c == 'A' and nX_mas(inp, row_len, i)) {
+            sum += 1;
+        }
+    }
+    return sum;
+}
+
+pub fn result2() ResultType1 {
+    return calculate2(file_contents);
 }
 
 test "example test1" {
     const expect = std.testing.expect;
 
     const exmpl =
-        \\....XXMAS.
-        \\.SAMXMS...
-        \\...S..A...
-        \\..A.A.MS.X
-        \\XMASAMX.MM
-        \\X.....XA.A
-        \\S.S.S.S.SS
-        \\.A.A.A.A.A
-        \\..M.M.M.MM
-        \\.X.X.XMASX
+        \\MMMSXXMASM
+        \\MSAMXMSMSA
+        \\AMXSXMAAMM
+        \\MSAMASMSMX
+        \\XMASAMXAMM
+        \\XXAMMXXAMA
+        \\SMSMSASXSS
+        \\SAXAMASAAA
+        \\MAMMMXMMMM
+        \\MXMXAXMASX
     ;
 
-    const res = calculate(exmpl);
-    try expect(res == 18);
+    const res1 = calculate1(exmpl);
+    const res2 = calculate2(exmpl);
+    try expect(res1 == 18);
+    try expect(res2 == 9);
 }
 
 test "example test2" {
     const expect = std.testing.expect;
 
-    const res = calculate(
+    const res = calculate1(
         \\XMAS
+        \\.MAM
         \\.MA.
-        \\.MA.
-        \\X..S
+        \\XS.S
     );
     try expect(res == 3);
 }
