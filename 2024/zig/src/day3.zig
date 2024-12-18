@@ -98,11 +98,11 @@ fn calculate2(inp: []const u8) ResultType1 {
 }
 
 pub fn result1() ResultType1 {
-    return calculate(file_contents);
+    return calculate(file_contents); // 184576302
 }
 
 pub fn result2() ResultType1 {
-    return calculate2(file_contents);
+    return calculate2(file_contents); // 118173507
 }
 
 test "example test1" {

@@ -42,7 +42,7 @@ pub fn build(b: *std.Build) void {
         if (file.kind == .file) {
             @memcpy(cwd_relative[assertFolder.len .. assertFolder.len + file.name.len], file.name);
             exe.root_module.addAnonymousImport(cwd_relative[3 .. assertFolder.len + file.name.len], .{ .root_source_file = .{ .cwd_relative = cwd_relative[0 .. assertFolder.len + file.name.len] } });
-            exe_unit_tests.root_module.addAnonymousImport(cwd_relative[3 .. assertFolder.len + file.name.len], .{ .root_source_file = .{ .cwd_relative = cwd_relative[0 .. assertFolder.len + file.name.len] } });
+            // exe_unit_tests.root_module.addAnonymousImport(cwd_relative[3 .. assertFolder.len + file.name.len], .{ .root_source_file = .{ .cwd_relative = cwd_relative[0 .. assertFolder.len + file.name.len] } });
         }
     }
 

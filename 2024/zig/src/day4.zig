@@ -89,7 +89,7 @@ fn calculate1(inp: []const u8) ResultType1 {
 }
 
 pub fn result1() ResultType1 {
-    return calculate1(file_contents);
+    return calculate1(file_contents); // 2718
 }
 
 fn calculate2(inp: []const u8) ResultType1 {
@@ -110,7 +110,7 @@ fn calculate2(inp: []const u8) ResultType1 {
 }
 
 pub fn result2() ResultType1 {
-    return calculate2(file_contents);
+    return calculate2(file_contents); // 2046
 }
 
 test "example test1" {

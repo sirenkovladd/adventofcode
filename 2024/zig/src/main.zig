@@ -30,6 +30,8 @@ pub fn main() !void {
     std.debug.print("day4.2: {}, {}μs\n", .{ day4.result2(), getTime() - startTime });
     startTime = getTime();
     std.debug.print("day5.1: {}, {}μs\n", .{ day5.result1(), getTime() - startTime });
+    startTime = getTime();
+    std.debug.print("day5.2: {}, {}μs\n", .{ day5.result2(), getTime() - startTime });
 }
 
 test {

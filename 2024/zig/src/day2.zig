@@ -191,11 +191,11 @@ fn parseLine2(input: []const u8, startI: usize) !returnType {
 }
 
 pub fn result() !u16 {
-    return calculate(parseLine1, file_contents);
+    return calculate(parseLine1, file_contents); // 356
 }
 
 pub fn result2() !u16 {
-    return calculate(parseLine2, file_contents);
+    return calculate(parseLine2, file_contents); // 413
 }
 
 test "example test1" {
