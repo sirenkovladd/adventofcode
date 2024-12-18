@@ -23,8 +23,8 @@ fn parseRow(input: []const u8, i: *usize, minTypeInt: type) !struct { minTypeInt
 }
 
 fn parse(input: []const u8, comptime minTypeInt: type, allocator: std.mem.Allocator) !struct { std.ArrayList(minTypeInt), std.ArrayList(minTypeInt) } {
-    var first = std.ArrayList(minTypeInt).init(allocator);
-    var second = std.ArrayList(minTypeInt).init(allocator);
+    var first = try std.ArrayList(minTypeInt).initCapacity(allocator, 1024);
+    var second = try std.ArrayList(minTypeInt).initCapacity(allocator, 1024);
     var i: usize = 0;
     while (i < input.len) {
         const row = try parseRow(input, &i, minTypeInt);
@@ -67,6 +67,7 @@ fn calculate2(input: []const u8, comptime minTypeInt: type, allocator: std.mem.A
     defer second.deinit();
 
     var map = std.AutoHashMap(minTypeInt, u8).init(allocator);
+    try map.ensureTotalCapacity(1 << 9);
     defer map.deinit();
     for (second.items) |val| {
         const entr = try map.getOrPut(val);
@@ -78,18 +79,17 @@ fn calculate2(input: []const u8, comptime minTypeInt: type, allocator: std.mem.A
 
     var sum: u32 = 0;
     for (first.items) |val| {
-        // std.debug.print("{} {} {any}\n", .{ sum, val, map.get(val) });
         sum += val * @as(u32, @intCast((map.get(val) orelse 0)));
     }
     return sum;
 }
 
 pub fn result(allocator: std.mem.Allocator) !u32 {
-    return calculate(file_contents, u17, allocator);
+    return calculate(file_contents, u17, allocator); // 2113135
 }
 
 pub fn result2(allocator: std.mem.Allocator) !u32 {
-    return calculate2(file_contents, u17, allocator);
+    return calculate2(file_contents, u17, allocator); // 19097157
 }
 
 test "simple test" {

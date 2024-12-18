@@ -22,12 +22,6 @@ pub fn build(b: *std.Build) void {
     var cwd_relative: [30]u8 = undefined;
     const assertFolder = "../assert/";
     @memcpy(cwd_relative[0..assertFolder.len], assertFolder);
-    while (iterator.next() catch unreachable) |file| {
-        if (file.kind == .file) {
-            @memcpy(cwd_relative[assertFolder.len .. assertFolder.len + file.name.len], file.name);
-            exe.root_module.addAnonymousImport(cwd_relative[3 .. assertFolder.len + file.name.len], .{ .root_source_file = .{ .cwd_relative = cwd_relative[0 .. assertFolder.len + file.name.len] } });
-        }
-    }
 
     b.installArtifact(exe);
 
@@ -44,6 +38,13 @@ pub fn build(b: *std.Build) void {
         .target = target,
         .optimize = optimize,
     });
+    while (iterator.next() catch unreachable) |file| {
+        if (file.kind == .file) {
+            @memcpy(cwd_relative[assertFolder.len .. assertFolder.len + file.name.len], file.name);
+            exe.root_module.addAnonymousImport(cwd_relative[3 .. assertFolder.len + file.name.len], .{ .root_source_file = .{ .cwd_relative = cwd_relative[0 .. assertFolder.len + file.name.len] } });
+            exe_unit_tests.root_module.addAnonymousImport(cwd_relative[3 .. assertFolder.len + file.name.len], .{ .root_source_file = .{ .cwd_relative = cwd_relative[0 .. assertFolder.len + file.name.len] } });
+        }
+    }
 
     const run_exe_unit_tests = b.addRunArtifact(exe_unit_tests);
 
