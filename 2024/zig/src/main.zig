@@ -4,6 +4,7 @@ const day2 = @import("day2.zig");
 const day3 = @import("day3.zig");
 const day4 = @import("day4.zig");
 const day5 = @import("day5.zig");
+const day6 = @import("day6.zig");
 const day7 = @import("day7.zig");
 
 pub fn main() !void {
@@ -33,6 +34,8 @@ pub fn main() !void {
     std.debug.print("day5.1: {}, {}μs\n", .{ day5.result1(), getTime() - startTime });
     startTime = getTime();
     std.debug.print("day5.2: {}, {}μs\n", .{ day5.result2(), getTime() - startTime });
+    startTime = getTime();
+    std.debug.print("day6.1: {}, {}μs\n", .{ day6.result1(), getTime() - startTime });
     startTime = getTime();
     std.debug.print("day7.1: {}, {}μs\n", .{ day7.result1(), getTime() - startTime });
     startTime = getTime();
