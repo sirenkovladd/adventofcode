@@ -190,7 +190,7 @@ fn parseLine2(input: []const u8, startI: usize) !returnType {
     return try isLineValid2(input, startI, 0, null, null, .Empty);
 }
 
-pub fn result() !u16 {
+pub fn result1() !u16 {
     return calculate(parseLine1, file_contents); // 356
 }
 

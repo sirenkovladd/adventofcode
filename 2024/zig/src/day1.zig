@@ -84,7 +84,7 @@ fn calculate2(input: []const u8, comptime minTypeInt: type, allocator: std.mem.A
     return sum;
 }
 
-pub fn result(allocator: std.mem.Allocator) !u32 {
+pub fn result1(allocator: std.mem.Allocator) !u32 {
     return calculate(file_contents, u17, allocator); // 2113135
 }
 

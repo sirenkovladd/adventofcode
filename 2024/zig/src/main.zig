@@ -1,52 +1,47 @@
 const std = @import("std");
-const day1 = @import("day1.zig");
-const day2 = @import("day2.zig");
-const day3 = @import("day3.zig");
-const day4 = @import("day4.zig");
-const day5 = @import("day5.zig");
-const day6 = @import("day6.zig");
-const day7 = @import("day7.zig");
+const days = .{
+    @import("day1.zig"),
+    @import("day2.zig"),
+    @import("day3.zig"),
+    @import("day4.zig"),
+    @import("day5.zig"),
+    @import("day6.zig"),
+    @import("day7.zig"),
+};
+
+const getTime = std.time.microTimestamp;
+
+fn run(comptime day: u8, comptime part: u2, comptime function: anytype, allocator: std.mem.Allocator) void {
+    const type_fn = @typeInfo(@TypeOf(function)).Fn;
+    const startTime = getTime();
+    if (type_fn.params.len == 0) {
+        if (@typeInfo(type_fn.return_type.?) != .Int) {
+            std.debug.print("day{}.{}: {}, {}μs\n", .{ day, part, function() catch unreachable, getTime() - startTime });
+        } else {
+            std.debug.print("day{}.{} {}, {}μs\n", .{ day, part, function(), getTime() - startTime });
+        }
+    } else {
+        if (@typeInfo(type_fn.return_type.?) != .Int) {
+            std.debug.print("day{}.{} {}, {}μs\n", .{ day, part, function(allocator) catch unreachable, getTime() - startTime });
+        } else {
+            std.debug.print("day{}.{} {}, {}μs\n", .{ day, part, function(allocator), getTime() - startTime });
+        }
+    }
+}
 
 pub fn main() !void {
     var buffer: [1 << 14]u8 = undefined;
     var fba = std.heap.FixedBufferAllocator.init(&buffer);
     const allocator = fba.allocator();
 
-    const getTime = std.time.microTimestamp;
-
-    var startTime = getTime();
-    std.debug.print("day1.1: {}, {}μs\n", .{ try day1.result(allocator), getTime() - startTime });
-    startTime = getTime();
-    std.debug.print("day1.2: {}, {}μs\n", .{ try day1.result2(allocator), getTime() - startTime });
-    startTime = getTime();
-    std.debug.print("day2.1: {}, {}μs\n", .{ try day2.result(), getTime() - startTime });
-    startTime = getTime();
-    std.debug.print("day2.2: {}, {}μs\n", .{ try day2.result2(), getTime() - startTime });
-    startTime = getTime();
-    std.debug.print("day3.1: {}, {}μs\n", .{ day3.result1(), getTime() - startTime });
-    startTime = getTime();
-    std.debug.print("day3.2: {}, {}μs\n", .{ day3.result2(), getTime() - startTime });
-    startTime = getTime();
-    std.debug.print("day4.1: {}, {}μs\n", .{ day4.result1(), getTime() - startTime });
-    startTime = getTime();
-    std.debug.print("day4.2: {}, {}μs\n", .{ day4.result2(), getTime() - startTime });
-    startTime = getTime();
-    std.debug.print("day5.1: {}, {}μs\n", .{ day5.result1(), getTime() - startTime });
-    startTime = getTime();
-    std.debug.print("day5.2: {}, {}μs\n", .{ day5.result2(), getTime() - startTime });
-    startTime = getTime();
-    std.debug.print("day6.1: {}, {}μs\n", .{ day6.result1(), getTime() - startTime });
-    startTime = getTime();
-    std.debug.print("day7.1: {}, {}μs\n", .{ day7.result1(), getTime() - startTime });
-    startTime = getTime();
-    std.debug.print("day7.2: {}, {}μs\n", .{ day7.result2(), getTime() - startTime });
+    inline for (days, 1..) |day, i| {
+        const day_fields = @typeInfo(day).Struct.decls;
+        inline for (day_fields, 1..) |decl, part| {
+            run(i, part, @field(day, decl.name), allocator);
+        }
+    }
 }
 
 test {
-    _ = @import("day1.zig");
-    _ = @import("day2.zig");
-    _ = @import("day3.zig");
-    _ = @import("day4.zig");
-    _ = @import("day5.zig");
-    _ = @import("day7.zig");
+    _ = days;
 }
