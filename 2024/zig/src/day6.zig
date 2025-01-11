@@ -190,6 +190,7 @@ test "example test1" {
     const res1 = calculate1(&exmpl1);
     try expect(41, res1);
 
-    const res2 = calculate2(&exmpl1);
+    var used_cell = [_]bool{false} ** (MaxSize * MaxSize);
+    const res2 = calculate2(&exmpl1, &used_cell);
     try expect(6, res2);
 }
