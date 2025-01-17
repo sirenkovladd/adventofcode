@@ -8,6 +8,7 @@ const days = .{
     @import("day6.zig"),
     @import("day7.zig"),
     @import("day8.zig"),
+    @import("day9.zig"),
 };
 
 const getTime = std.time.microTimestamp;
