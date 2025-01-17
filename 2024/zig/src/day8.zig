@@ -15,15 +15,10 @@ const AntinodesManager = struct {
     list_antinodes: [3000]bool = [_]bool{false} ** 3000,
     result: ReturnType = 0,
 
-    fn addAntinode(self: *Self, i: usize, ant: usize, width: usize) void {
-        const x1 = i % width;
-        const x2 = ant % width;
-        if (if (x1 <= x2) 2 * x2 - x1 < width - 1 else 2 * x2 >= x1) {
-            const ai = 2 * ant - i;
-            if (!self.list_antinodes[ai]) {
-                self.list_antinodes[ai] = true;
-                self.result += 1;
-            }
+    fn addAntinode(self: *Self, pos: usize) void {
+        if (!self.list_antinodes[pos]) {
+            self.list_antinodes[pos] = true;
+            self.result += 1;
         }
     }
 };
@@ -36,7 +31,7 @@ const ListAntennas = struct {
     n: u8,
 };
 
-fn calculate1(inp: []const u8) ReturnType {
+fn calculate(inp: []const u8, comptime is_harmonics: bool) ReturnType {
     const width = getWidth(inp) + 1;
     var list_antennas: [60]ListAntennas = undefined;
     var n: u8 = 0;
@@ -48,12 +43,50 @@ fn calculate1(inp: []const u8) ReturnType {
             for (list_antennas[0..n]) |*lant| {
                 if (lant.frequency == c) {
                     for (lant.list[0..lant.n]) |ant| {
-                        // std.debug.print("= => {} {} % {}\n", .{ ant % width, i % width, width });
-                        if (i <= 2 * ant) {
-                            antinodes_manager.addAntinode(i, ant, width);
-                        }
-                        if (2 * i - ant < inp.len) {
-                            antinodes_manager.addAntinode(ant, i, width);
+                        const diff = i - ant;
+                        const i_x = i % width;
+                        const ant_x = ant % width;
+                        if (is_harmonics) {
+                            antinodes_manager.addAntinode(ant);
+                            antinodes_manager.addAntinode(i);
+                            var next = ant;
+                            var x_pos = ant_x;
+                            if (i_x >= x_pos) {
+                                const diffx = i_x - x_pos;
+                                while (next >= diff and x_pos >= diffx) {
+                                    next -= diff;
+                                    x_pos -= diffx;
+                                    antinodes_manager.addAntinode(next);
+                                }
+                                next = i;
+                                x_pos = i_x;
+                                while (next + diff < inp.len and x_pos + diffx < width - 1) {
+                                    next += diff;
+                                    x_pos += diffx;
+                                    antinodes_manager.addAntinode(next);
+                                }
+                            } else {
+                                const diffx = x_pos - i_x;
+                                while (next >= diff and x_pos + diffx < width - 1) {
+                                    next -= diff;
+                                    x_pos += diffx;
+                                    antinodes_manager.addAntinode(next);
+                                }
+                                next = i;
+                                x_pos = i_x;
+                                while (next + diff < inp.len and x_pos >= diffx) {
+                                    next += diff;
+                                    x_pos -= diffx;
+                                    antinodes_manager.addAntinode(next);
+                                }
+                            }
+                        } else {
+                            if (ant >= diff and (if (i_x >= ant_x) 2 * ant_x >= i_x else 2 * ant_x + 1 < i_x + width)) {
+                                antinodes_manager.addAntinode(ant - diff);
+                            }
+                            if (i + diff < inp.len and (if (i_x >= ant_x) 2 * i_x + 1 < width + ant_x else 2 * i_x >= ant_x)) {
+                                antinodes_manager.addAntinode(i + diff);
+                            }
                         }
                     }
                     lant.list[lant.n] = i;
@@ -69,7 +102,6 @@ fn calculate1(inp: []const u8) ReturnType {
                 };
                 n += 1;
             }
-            // std.debug.print("{} {c} {}\n", .{ i, c, n });
             std.debug.assert(n < list_antennas.len);
         }
     }
@@ -77,8 +109,11 @@ fn calculate1(inp: []const u8) ReturnType {
 }
 
 pub fn result1() ReturnType {
-    // var file_contents1 = file_contents.*;
-    return calculate1(file_contents); // 341
+    return calculate(file_contents, false); // 341
+}
+
+pub fn result2() ReturnType {
+    return calculate(file_contents, true); // 1134
 }
 
 test "example test1" {
@@ -99,9 +134,11 @@ test "example test1" {
         \\............
     ;
 
-    // var exmpl1 = exmpl.*;
-    const res1 = calculate1(exmpl);
+    const res1 = calculate(exmpl, false);
     try expect(14, res1);
+
+    const res2 = calculate(exmpl, true);
+    try expect(34, res2);
 }
 
 test "example test2" {
@@ -120,8 +157,7 @@ test "example test2" {
         \\..........
     ;
 
-    // var exmpl1 = exmpl.*;
-    const res1 = calculate1(exmpl);
+    const res1 = calculate(exmpl, false);
     try expect(4, res1);
 }
 
@@ -141,8 +177,7 @@ test "example test3" {
         \\..........
     ;
 
-    // var exmpl1 = exmpl.*;
-    const res1 = calculate1(exmpl);
+    const res1 = calculate(exmpl, false);
     try expect(4, res1);
 }
 
@@ -156,7 +191,7 @@ test "example test4" {
         \\..........
     ;
 
-    const res1 = calculate1(exmpl);
+    const res1 = calculate(exmpl, false);
     try expect(0, res1);
 
     const exmpl2 =
@@ -166,6 +201,43 @@ test "example test4" {
         \\.....6....
     ;
 
-    const res2 = calculate1(exmpl2);
+    const res2 = calculate(exmpl2, false);
     try expect(0, res2);
+}
+
+test "example test5" {
+    const expect = std.testing.expectEqual;
+
+    const exmpl =
+        \\T.........
+        \\...T......
+        \\.T........
+        \\..........
+        \\..........
+        \\..........
+        \\..........
+        \\..........
+        \\..........
+        \\..........
+    ;
+
+    const res1 = calculate(exmpl, true);
+    try expect(9, res1);
+}
+
+test "example test6" {
+    const expect = std.testing.expectEqual;
+
+    const exmpl =
+        \\...........
+        \\...........
+        \\...........
+        \\........0..
+        \\.......0...
+        \\...........
+        \\...........
+    ;
+
+    const res1 = calculate(exmpl, true);
+    try expect(6, res1);
 }
