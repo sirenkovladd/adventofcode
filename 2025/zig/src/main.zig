@@ -4,6 +4,7 @@ const getTime = std.time.microTimestamp;
 const days = .{
     @import("day1.zig"),
     @import("day2.zig"),
+    @import("day3.zig"),
 };
 
 fn run(comptime day: u8, comptime part: u2, comptime function: anytype, allocator: std.mem.Allocator) void {
