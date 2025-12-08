@@ -9,7 +9,6 @@ fn checkBorder(comptime needToRemove: bool, comptime reverse: bool, begin: usize
     var res: Result = 0;
     for (1..max - 1) |i| {
         const pos = begin + i * step;
-        // std.debug.print("{} {c}\n", .{ pos, input[pos] });
         if (input[pos] == '@') {
             var count: u8 = 0;
             if (input[pos - step] == '@') {
@@ -31,7 +30,6 @@ fn checkBorder(comptime needToRemove: bool, comptime reverse: bool, begin: usize
                 if (needToRemove) {
                     input[pos] = '.';
                 }
-                // std.debug.print(">{} {}\n", .{ pos, count });
                 res += 1;
             }
         }
@@ -55,7 +53,6 @@ fn checkFrame(comptime needToRemove: bool, sizeRow: usize, size: usize, input: i
     inline for (.{ 0, size }) |j| {
         inline for (.{ 0, sizeRow - 2 }) |i| {
             const pos = j * sizeRow + i;
-            // std.debug.print("{} {c}\n", .{ pos, input[pos] });
             if (input[pos] == '@') {
                 var count: u8 = 0;
                 if (i > 0) {
@@ -80,7 +77,6 @@ fn checkFrame(comptime needToRemove: bool, sizeRow: usize, size: usize, input: i
                     if (needToRemove) {
                         input[pos] = '.';
                     }
-                    // std.debug.print("{} {}\n", .{ j, i });
                     res += 1;
                 }
             }
@@ -96,13 +92,10 @@ fn calculate(comptime needToRemove: bool, input: if (needToRemove) []u8 else []c
 
     // First horizontal
     res += checkFrame(needToRemove, sizeRow, size, input);
-    // std.debug.print("res={}\n", .{res});
 
-    // std.debug.print("size={} sizeRow={}\n", .{ size, sizeRow });
     for (1..sizeRow - 2) |i| {
         for (1..size) |j| {
             const pos = j * sizeRow + i;
-            // std.debug.print("{} {c} {} {}\n", .{ pos, input[pos], j, i });
             if (input[pos] == '@') {
                 var count: u8 = 0;
                 inline for (.{ 0, 1, 2 }) |dj| {
@@ -117,7 +110,6 @@ fn calculate(comptime needToRemove: bool, input: if (needToRemove) []u8 else []c
                     if (needToRemove) {
                         input[pos] = '.';
                     }
-                    // std.debug.print("{} {}\n", .{ j, i });
                     res += 1;
                 }
             }

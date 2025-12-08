@@ -10,6 +10,7 @@ const days = .{
     @import("day2.zig"),
     @import("day3.zig"),
     @import("day4.zig"),
+    @import("day5.zig"),
 };
 
 fn run(comptime day: u8, comptime part: u2, comptime function: anytype, allocator: std.mem.Allocator) !void {
